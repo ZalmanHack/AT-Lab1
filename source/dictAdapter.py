@@ -3,6 +3,8 @@ import os.path
 import re
 import json
 
+from tqdm import tqdm
+
 
 class DictAdapter:
     def __init__(self):
@@ -83,7 +85,7 @@ class DictAdapter:
     def fit(self) -> None:
         self.dict_data: dict = {}
         words = self.__parse_words()
-        [self.__add_ngrams(word) for word in words]
+        [self.__add_ngrams(word) for word in tqdm(words, desc=f"Создание словаря")]
 
     def save(self, file_name: str) -> None:
         with open(file_name, 'w', encoding='utf-8') as file:
@@ -93,7 +95,7 @@ class DictAdapter:
 
     def open(self, file_name) -> None:
         with open(file_name, 'r', encoding='utf-8') as file:
-            data = json.loads(file.read())
+            data = json.loads('\n'.join([line for line in tqdm(file, desc="Чтение словаря")]))
             self.ngram_len = int(data["ngram_len"])
             self.dict_data = self.__key_to_int(data["dict_data"])
             pass
@@ -101,11 +103,12 @@ class DictAdapter:
     def get(self) -> dict:
         return self.dict_data
 
+    # возвращает список слов для каждой найденой N граммы
     def find(self, word: str) -> set:
-        words: set = set()
-        for index, ngram in enumerate(self.__get_ngrams(word)):
+        words = set()
+        for index, ngram in enumerate(tqdm(self.__get_ngrams(word), desc=f"Поиск {self.ngram_len}-грамм", ncols=100)):
             if index in self.dict_data and ngram in self.dict_data[index]:
-                words.update(set(self.dict_data[index][ngram]))
+                words = words.union(self.dict_data[index][ngram])
         return words
 
 
