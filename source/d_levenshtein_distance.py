@@ -1,7 +1,7 @@
 import os
 from multiprocessing import Pool
 from source.dictAdapter import DictAdapter
-from tqdm import tqdm
+
 
 class DLevenshteinDistance:
     def __init__(self, dictAdapter: DictAdapter):
@@ -23,8 +23,8 @@ class DLevenshteinDistance:
         return error
 
     @classmethod
-    def __get_distance(cls, word_1, word_2):
-        distance: dict = {}
+    def __get_distance(cls, word_1: str, word_2: str) -> float:
+        distance = {}
         len_word_1 = len(word_1)
         len_word_2 = len(word_2)
         for i in range(-1, len_word_1 + 1):
@@ -44,7 +44,7 @@ class DLevenshteinDistance:
         return distance[len_word_1 - 1, len_word_2 - 1] + cls.priority_error(word_1, word_2)
 
     @classmethod
-    def get_distances(cls, base_word, found_words):
+    def get_distances(cls, base_word: str, found_words: set) -> list:
         result = []
         if len(found_words) == 0:
             return result
@@ -52,10 +52,10 @@ class DLevenshteinDistance:
             result.append((cls.__get_distance(base_word, word), word))
         return result
 
-    def find(self, base_word: str):
+    def find(self, base_word: str) -> set:
         found_words = list(self.dictAdapter.find(base_word))
         args = []
-        results: set = set()
+        results = set()
         if len(found_words) > 0:
             if len(found_words) < self.pool_len:
                 args = [('', []) for _ in range(self.pool_len)]
@@ -67,5 +67,5 @@ class DLevenshteinDistance:
             pool_answer = self.pool.starmap(DLevenshteinDistance.get_distances, args)
             for words in pool_answer:
                 results = results.union(words)
-            return sorted(results)
+            return results
         return results
