@@ -133,7 +133,7 @@ class DictAdapter:
     # возвращает список слов для каждой найденой N граммы
     def find(self, word: str) -> set:
         words = set()
-        for index, ngram in enumerate(tqdm(self.__get_ngrams(word), desc=f"Поиск {self.ngram_len}-грамм", ncols=100)):
+        for index, ngram in enumerate(self.__get_ngrams(word)):
             if index in self.dict_data and ngram in self.dict_data[index]:
                 words = words.union(self.dict_data[index][ngram])
         return words
