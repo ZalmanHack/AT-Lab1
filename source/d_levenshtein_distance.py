@@ -5,7 +5,7 @@ from source.dictAdapter import DictAdapter
 class DLevenshteinDistance:
     def __init__(self, dictAdapter: DictAdapter):
         self.dictAdapter = dictAdapter
-        self.pool_len = 1  # os.cpu_count()
+        self.pool_len = os.cpu_count()
         self.pool = Pool(self.pool_len)
 
     @staticmethod
